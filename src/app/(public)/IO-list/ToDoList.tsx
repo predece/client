@@ -15,7 +15,7 @@ import TaskExpired from "@/components/TaskExpired";
 import MessageTask from "@/message/messageTask";
 
 const ToDoList = () => {
-  const { store, user, task, taskNow } = useContext(Context);
+  const { store, user, task } = useContext(Context);
 
   const [userName, setUserName] = useState<string | null>();
   const [name, setName] = useState<string>("");
@@ -64,6 +64,7 @@ const ToDoList = () => {
     { checkOpenBorder: checkPersonalization ? "bg-gray-200/80 rounded ease-in-out" : "" },
   ];
   useEffect(() => {
+    setState(true);
     setTimeout(() => {
       try {
         setUserName(user.getUser()?.name);
