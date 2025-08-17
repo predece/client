@@ -21,10 +21,10 @@ const TaskNotifications = () => {
       socket.emit("register", userId);
     }
     socket.on("taskUserConnectionId", (task: ItaskNotifications) => {
-      taskNow.postTask(task.task);
+      taskNow.postTask([task.task]);
     });
     socket.on("expiredTask", (taskConf: ItaskNotifications) => {
-      taskNow.postTaskDeadline(taskConf.task);
+      taskNow.postTaskDeadline([taskConf.task]);
       message.postQuantity(2);
       task.postWindowMessageTask(true);
     });

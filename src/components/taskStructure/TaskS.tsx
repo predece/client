@@ -96,13 +96,15 @@ const TaskS = ({ caseId }: Itasks) => {
     }, 1000);
   };
 
-  const TimerDeadline = (date: string, taskId: number) => {
+  const TimerDeadline = (date: Date | null, taskId: number) => {
     const now = new Date();
-    const deadlineDate = new Date(date);
-    const diffInSeconds = Math.floor((deadlineDate.getTime() - now.getTime()) / 1000);
+    if (date) {
+      const deadlineDate = new Date(date);
+      const diffInSeconds = Math.floor((deadlineDate.getTime() - now.getTime()) / 1000);
 
-    if (diffInSeconds > 0 && diffInSeconds <= 300) {
-      startTimerForTask(taskId, diffInSeconds);
+      if (diffInSeconds > 0 && diffInSeconds <= 300) {
+        startTimerForTask(taskId, diffInSeconds);
+      }
     }
   };
 
@@ -127,7 +129,7 @@ const TaskS = ({ caseId }: Itasks) => {
         setDateConfig(dateConfigQ);
 
         arrNewTask.forEach((taskItem: Itask) => {
-          if (taskItem.notified) {
+          if (taskItem.notified && taskItem.deadline && taskItem.id) {
             TimerDeadline(taskItem.deadline, taskItem.id);
           }
         });
