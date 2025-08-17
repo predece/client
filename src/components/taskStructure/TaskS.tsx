@@ -110,9 +110,9 @@ const TaskS = ({ caseId }: Itasks) => {
     const task = async () => {
       try {
         const data = await GetTask();
-        let arrNewTask: Itask[] = data.filter((task: Itask) => task.status === "todo");
-        let arrFinishedTask: Itask[] = data.filter((task: Itask) => task.status === "done");
-        let arrExpiredTask: Itask[] = data.filter((task: Itask) => task.status === "expired");
+        const arrNewTask: Itask[] = data.filter((task: Itask) => task.status === "todo");
+        const arrFinishedTask: Itask[] = data.filter((task: Itask) => task.status === "done");
+        const arrExpiredTask: Itask[] = data.filter((task: Itask) => task.status === "expired");
 
         taskNow.postTask(arrNewTask);
         taskNow.postTaskFinished(arrFinishedTask);

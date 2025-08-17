@@ -46,7 +46,7 @@ const ToDoList = () => {
       formData.append("img", img);
     }
     if (name || img) {
-      let parseUser = localStorage.getItem("userEmail");
+      const parseUser = localStorage.getItem("userEmail");
       if (parseUser) {
         const userEmail = JSON.parse(parseUser);
         formData.append("email", userEmail);

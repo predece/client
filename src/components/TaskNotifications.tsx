@@ -5,7 +5,12 @@ import { useEffect } from "react";
 import io from "socket.io-client";
 import { useContext } from "react";
 import { Context } from "@/app/mobx-provider";
+import type { Itask } from "@/store/taskDeadlineStore";
 let socket: any;
+
+interface ItaskNotifications {
+  task: Itask;
+}
 
 const TaskNotifications = () => {
   const { taskNow, message, task } = useContext(Context);
@@ -15,10 +20,10 @@ const TaskNotifications = () => {
     if (userId) {
       socket.emit("register", userId);
     }
-    socket.on("taskUserConnectionId", (task: any) => {
+    socket.on("taskUserConnectionId", (task: ItaskNotifications) => {
       taskNow.postTask(task.task);
     });
-    socket.on("expiredTask", (taskConf: any) => {
+    socket.on("expiredTask", (taskConf: ItaskNotifications) => {
       taskNow.postTaskDeadline(taskConf.task);
       message.postQuantity(2);
       task.postWindowMessageTask(true);

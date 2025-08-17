@@ -9,7 +9,7 @@ const MessageTask = () => {
   let page;
 
   useEffect(() => {
-    let urlStatus = message.getQuantity();
+    const urlStatus = message.getQuantity();
     switch (urlStatus) {
       case 1:
         page = "Входящие";
