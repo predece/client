@@ -118,7 +118,15 @@ const ToDoList = () => {
                   <div className="flex gap-1">
                     <label className="flex cursor-pointer items-center w-[160px] h-9 p-1 border border-gray-500/50 rounded transition-colors ease-in-out duration-700 outline-none  focus:border-gray-800">
                       <p className="text-gray-500 text-[15px]">Выберите файл</p>
-                      <input className="hidden" type="file" onChange={(e) => setImg(e.target.files[0])} />
+                      <input
+                        className="hidden"
+                        type="file"
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files[0]) {
+                            setImg(e.target.files[0]);
+                          }
+                        }}
+                      />
                     </label>
                     <button
                       className="cursor-pointer border rounded p-2 border-gray-500/50 hover:bg-gray-200/80 transition duration-300 ease-in-out hover:translate-x-1 w-[34px]"
