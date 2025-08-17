@@ -19,7 +19,7 @@ const ToDoList = () => {
 
   const [userName, setUserName] = useState<string | null>();
   const [name, setName] = useState<string>("");
-  const [img, setImg] = useState<string>("");
+  const [img, setImg] = useState<File | string | null>(null);
   const [urlImage, setUrlImage] = useState<string | null>();
   const [state, setState] = useState<boolean>(true);
   const [checkPersonalization, setCheckPersonalization] = useState<boolean>(false);
