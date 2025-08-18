@@ -15,7 +15,7 @@ interface ItaskNotifications {
 const TaskNotifications = () => {
   const { taskNow, message, task } = useContext(Context);
   useEffect(() => {
-    socket = io("http://localhost:7000/");
+    socket = io("https://back-production-533d.up.railway.app/");
     const userId = localStorage.getItem("userEmail");
     if (userId) {
       socket.emit("register", userId);
