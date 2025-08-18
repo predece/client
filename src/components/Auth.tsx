@@ -50,7 +50,7 @@ const Auth = ({ page }: ICheckPage) => {
       setCheck(check + 1);
     }
 
-    if (1 === 1) {
+    if (check === 3) {
       try {
         let data;
         if (!namePage) {
