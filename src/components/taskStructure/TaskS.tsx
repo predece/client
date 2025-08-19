@@ -156,7 +156,7 @@ const TaskS = ({ caseId }: Itasks) => {
     return () => {
       clearInterval(DestroyInterval);
     };
-  }, [taskNow.getTaskDeadline(), taskNow.getTaskFinished(), taskNow.getTask()]);
+  }, [taskNow.getTaskDeadline().length, taskNow.getTaskFinished().length, taskNow.getTask().length]);
 
   return (
     <div className="font-normal text-[15px] ">
