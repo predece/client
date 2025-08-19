@@ -33,7 +33,7 @@ const NewTask = () => {
   useEffect(() => {
     const userId = getCookie("userEmail");
     if (userId) {
-      setConfig((state) => ({ ...state, UserId: JSON.parse(userId) }));
+      setConfig((state) => ({ ...state, UserId: userId }));
     }
   }, []);
 

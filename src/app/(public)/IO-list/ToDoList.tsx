@@ -13,6 +13,9 @@ import TaskInComplite from "@/components/TaskInComplite";
 import TaskDone from "@/components/TaskDone";
 import TaskExpired from "@/components/TaskExpired";
 import MessageTask from "@/message/messageTask";
+import { getCookie } from "@/components/taskStructure/TaskS";
+import Link from "next/link";
+import { CONFIG } from "@/config/page.config";
 
 const ToDoList = () => {
   const { store, user, task } = useContext(Context);
@@ -46,9 +49,8 @@ const ToDoList = () => {
       formData.append("img", img);
     }
     if (name || img) {
-      const parseUser = localStorage.getItem("userEmail");
-      if (parseUser) {
-        const userEmail = JSON.parse(parseUser);
+      const userEmail = getCookie("userEmail");
+      if (userEmail) {
         formData.append("email", userEmail);
         const data = await Config(formData);
         if (data.data) {
@@ -77,9 +79,12 @@ const ToDoList = () => {
   return (
     <>
       <div className="w-screen h-screen grid grid-cols-[auto_1fr] overflow-x-hidden overflow-y-auto">
+        <Link className="fixed  right-1 m-2 border p-2 rounded-[50%] cursor-pointer flex text-center hover:bg-gray-200/80 duration-300 ease-in-out border-gray-800/50" href={CONFIG.getHellowPage()}>
+          Back
+        </Link>
         {state ? (
-          <section className="w-55 2xl:w-85 xl:w-80 lg:w-70 md:w-70 sm:w-65">
-            <section className="fixed  w-55 2xl:w-85 xl:w-80 lg:w-70 md:w-70 sm:w-65 bg-[#FCFAF8] p-5 transition-all h-full min-h-screen duration-200">
+          <section className="w-55 2xl:w-85 xl:w-80 lg:w-70 md:w-70 sm:w-65  bg-[#FCFAF8]">
+            <section className="fixed  w-55 2xl:w-85 xl:w-80 lg:w-70 md:w-70 sm:w-65 p-3 transition-all h-full min-h-screen duration-200">
               <section className="flex justify-between h-15">
                 <button
                   className={`flex items-center h-auto cursor-pointer transition-color p-[0px_10px] duration-200 ease-in-out hover:bg-hover-color rounded ${visibilityClass[1].checkOpenBorder}`}
