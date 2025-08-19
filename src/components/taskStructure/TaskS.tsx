@@ -150,13 +150,13 @@ const TaskS = ({ caseId }: Itasks) => {
       }
     };
 
-    const DestroyInterval = setInterval(task, 30000);
+    const DestroyInterval = setInterval(task, 1000);
     task();
 
     return () => {
       clearInterval(DestroyInterval);
     };
-  }, [taskNow.getTaskDeadline().length, taskNow.getTaskFinished().length, taskNow.getTask().length]);
+  }, []);
 
   return (
     <div className="font-normal text-[15px] ">
