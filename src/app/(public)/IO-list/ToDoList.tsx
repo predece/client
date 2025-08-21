@@ -2,10 +2,12 @@
 
 import { observer } from "mobx-react-lite";
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import { Context } from "@/app/mobx-provider";
-import { useContext } from "react";
-import { Config } from "@/http/Config";
+import { useEffect, useState, useContext } from "react"; // Импортируйте useContext и useState
+
+import { Context } from "@/app/mobx-provider"; // Укажите правильный путь к Context
+
+import { Config } from "@/http/Config"; // Укажите правильный путь к Config
+
 import ErrorMessage from "@/error/errorMessage";
 import Loading from "../../../components/Loading";
 import NewTask from "../../../components/NewTask";
@@ -22,7 +24,7 @@ const ToDoList = () => {
 
   const [userName, setUserName] = useState<string | null>();
   const [name, setName] = useState<string>("");
-  const [img, setImg] = useState<File | string>("");
+  const [img, setImg] = useState<File | null>(null);
   const [urlImage, setUrlImage] = useState<string | null>();
   const [state, setState] = useState<boolean>(true);
   const [checkPersonalization, setCheckPersonalization] = useState<boolean>(false);
@@ -42,22 +44,33 @@ const ToDoList = () => {
   };
   const FuSaveConfig = async (type: string) => {
     const formData = new FormData();
+
     if (type === "name" && name.length <= 16) {
       console.log(name.length);
       formData.append("name", name);
-    } else {
+    } else if (type === "image" && img) {
       formData.append("img", img);
+    } else {
+      store.postError("Файл изображения не выбран");
+      return;
     }
-    if (name || img) {
+
+    if ((type === "name" && name) || (type === "image" && img)) {
       const userEmail = getCookie("userEmail");
       if (userEmail) {
         formData.append("email", userEmail);
-        const data = await Config(formData);
-        if (data.data) {
-          setUserName(data.data.name);
-          setUrlImage(data.data.img);
+        try {
+          console.log("FormData before sending:", formData.get("img"));
+          const data = await Config(formData);
+          if (data?.data) {
+            setUserName(data.data.name);
+            setUrlImage(data.data.img);
+          }
+          store.postError(data?.message || "Неизвестная ошибка");
+        } catch (error) {
+          console.error("Ошибка при сохранении конфигурации:", error);
+          store.postError("Ошибка сети при сохранении.");
         }
-        store.postError(data.message);
       }
     }
   };
@@ -91,7 +104,7 @@ const ToDoList = () => {
                   onClick={(e) => personalizationUser(e)}
                 >
                   <Image
-                    src={urlImage ? `https://back-production-533d.up.railway.app/${urlImage}` : "/DefaulUser.svg"}
+                    src={urlImage ? urlImage : "/DefaulUser.svg"}
                     alt="DefaultUser"
                     width={0}
                     height={0}
@@ -126,9 +139,12 @@ const ToDoList = () => {
                       <input
                         className="hidden"
                         type="file"
+                        name="img"
                         onChange={(e) => {
                           if (e.target.files && e.target.files[0]) {
                             setImg(e.target.files[0]);
+                          } else {
+                            setImg(null);
                           }
                         }}
                       />

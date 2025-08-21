@@ -16,7 +16,7 @@ interface ItaskNotifications {
 const TaskNotifications = () => {
   const { taskNow, message, task } = useContext(Context);
   useEffect(() => {
-    socket = io("https://back-production-533d.up.railway.app/");
+    socket = io("https://back-production-533d.up.railway.app//");
     const userId = getCookie("userEmail");
     if (userId) {
       socket.emit("register", userId);
