@@ -60,15 +60,12 @@ const ToDoList = () => {
       if (userEmail) {
         formData.append("email", userEmail);
         try {
-          console.log("FormData before sending:", formData.get("img"));
           const data = await Config(formData);
           if (data?.data) {
             setUserName(data.data.name);
             setUrlImage(data.data.img);
           }
-          store.postError(data?.message || "Неизвестная ошибка");
         } catch (error) {
-          console.error("Ошибка при сохранении конфигурации:", error);
           store.postError("Ошибка сети при сохранении.");
         }
       }
