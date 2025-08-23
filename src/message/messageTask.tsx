@@ -32,16 +32,19 @@ const MessageTask = () => {
         task.postWindowTitleTask(true);
         task.postWindowExpiredTask(false);
         task.postWindowDoneTask(false);
+        task.postBackGroundTitle("incoming");
         break;
       case 2:
         task.postWindowExpiredTask(true);
         task.postWindowDoneTask(false);
         task.postWindowTitleTask(false);
+        task.postBackGroundTitle("expired");
         break;
       case 3:
         task.postWindowDoneTask(true);
         task.postWindowTitleTask(false);
         task.postWindowExpiredTask(false);
+        task.postBackGroundTitle("done");
         break;
     }
     task.postWindowMessageTask(false);

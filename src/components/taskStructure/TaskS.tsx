@@ -1,13 +1,16 @@
 "use client";
 
 import { observer } from "mobx-react-lite";
-import { useEffect, useState, useRef } from "react"; // Добавил useRef
+import { useEffect, useState } from "react"; // Добавил useRef
 import { useContext } from "react";
 import { Context } from "@/app/mobx-provider";
 import { DeleteTask, FinishedTask, GetTask } from "@/http/Task";
 import { configurationData, type IconfigurationData } from "@/config/Time.config";
 import type { Itask } from "@/store/taskDeadlineStore";
 import Image from "next/image";
+import UpdateFunction from "../UpdateTask";
+import { reaction } from "mobx";
+import { buttonStyle } from "../NewTask";
 
 interface Itasks {
   caseId: number;
@@ -32,16 +35,18 @@ export function getCookie(name: string) {
 }
 
 const TaskS = ({ caseId }: Itasks) => {
-  const { taskNow, task } = useContext(Context);
+  const { message, taskNow, task } = useContext(Context);
   const [dateConfig, setDateConfig] = useState<IformDate[]>([]);
   const [timers, setTimers] = useState<ItimerState>({});
+  const [currentTask, setCurrentTask] = useState<Itask>();
+  const [deleteTask, setDeleteTask] = useState<boolean>(false);
 
-  const checkIdDate = (id: number) => {
+  const checkIdDate = (id: any) => {
     for (const check of dateConfig) {
       if (check.id == id) {
         return (
           <>
-            <span key={check.id} className="flex gap-1 text-[13px] text-red-700" onClick={newDeadline}>
+            <span key={check.id} className="flex gap-1 text-[13px] text-red-700">
               <div>Дедлайн: </div>
               <div>{check.day}</div>
               <div>{check.month}</div>
@@ -52,12 +57,13 @@ const TaskS = ({ caseId }: Itasks) => {
       }
     }
   };
-  const newDeadline = () => {};
-  const fuFinishedTask = async (id: number) => {
+  const fuFinishedTask = async (id: any) => {
     try {
-      const task = await FinishedTask(id);
-      if (!task.message) {
-        taskNow.postTaskFinished(task);
+      const taskFinished = await FinishedTask(id);
+      if (!taskFinished.message) {
+        taskNow.postTaskFinished(taskFinished);
+        message.postQuantity(3);
+        task.postWindowMessageTask(true);
       }
     } catch (e) {
       console.error(e);
@@ -69,7 +75,6 @@ const TaskS = ({ caseId }: Itasks) => {
       await DeleteTask(id);
       const data = await GetTask();
       taskNow.postTask(data);
-      taskNow.postTaskFinished(data);
     } catch (e) {
       console.error(e);
     }
@@ -80,6 +85,7 @@ const TaskS = ({ caseId }: Itasks) => {
 
     const minutes = Math.floor(initialTime / 60);
     const seconds = initialTime % 60;
+
     setTimers((prev) => ({
       ...prev,
       [taskId]: { minutes, seconds },
@@ -150,12 +156,17 @@ const TaskS = ({ caseId }: Itasks) => {
       }
     };
 
-    const DestroyInterval = setInterval(task, 1000);
     task();
 
-    return () => {
-      clearInterval(DestroyInterval);
-    };
+    const disposer = reaction(
+      () => [taskNow.getTask().length, taskNow.getTaskDeadline().length, taskNow.getTaskFinished().length],
+      async (changes, prev) => {
+        if (changes.some((val, i) => val !== prev[i])) {
+          await task();
+        }
+      }
+    );
+    return () => disposer();
   }, []);
 
   return (
@@ -180,7 +191,7 @@ const TaskS = ({ caseId }: Itasks) => {
                       <div>{taskData.priority}</div>
                     </div>
                     {taskData.description && <div className="text-[13px] text-gray-500">{taskData.description}</div>}
-                    <div className="flex justify-between">
+                    <div className="flex justify-between mb-2">
                       {checkIdDate(taskData.id)}
                       <div>
                         {taskData.notified && timers[taskData.id] && (
@@ -202,26 +213,42 @@ const TaskS = ({ caseId }: Itasks) => {
         ))}
       {caseId == 2 &&
         (taskNow.getTaskDeadline().length > 0 ? (
-          taskNow.getTaskDeadline().map((taskData: any) => (
-            <section key={taskData.id} className="grid h-full mt-2">
-              <div className="flex ">
-                <div className="flex h-5 w-7">
-                  <input onClick={() => fuFinishedTask(taskData.id)} type="radio" className="cursor-pointer" />
-                </div>
-                <div className="grid w-full">
-                  <div className="flex  items-center justify-between">
-                    <div className="">{taskData.title}</div>
-                    <div>{taskData.priority}</div>
+          taskNow
+            .getTaskDeadline()
+            .filter((taskData): taskData is Itask => Boolean(taskData))
+            .map((taskData: Itask) => (
+              <section key={taskData.id} className="grid h-full mt-2">
+                <div className="flex ">
+                  <div className="flex h-5 w-7">
+                    <input onClick={() => fuFinishedTask(taskData.id)} type="radio" className="cursor-pointer" />
                   </div>
-                  {taskData.description && <div className="text-[13px] text-gray-500">{taskData.description}</div>}
-                  {checkIdDate(taskData.id)}
+                  <div className="grid w-full">
+                    <div className="flex  items-center justify-between">
+                      <div className="">{taskData.title}</div>
+                      <div>{taskData.priority}</div>
+                    </div>
+                    {taskData.description && <div className="text-[13px] text-gray-500">{taskData.description}</div>}
+                    <div className="flex justify-between mb-2">
+                      <div>{checkIdDate(taskData.id)}</div>
+                      <Image
+                        src="/Setting.svg"
+                        alt="Setting"
+                        height={18}
+                        width={18}
+                        onClick={() => {
+                          task.postWindowUpdateTask(true);
+                          setCurrentTask(taskData);
+                        }}
+                        className="cursor-pointer"
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <hr className="mb-2 text-gray-500/10" />
-            </section>
-          ))
+                <hr className="mb-2 text-gray-500/10" />
+              </section>
+            ))
         ) : (
-          <div className="font-normal text-[14px] text-gray-500 mt-1 cursor-pointer hover:text-gray-600 duration-300 ease-in-out">У вас нет просроченных задач!</div>
+          <div className="font-normal text-[14px] text-gray-500 mt-1 hover:text-gray-600 duration-300 ease-in-out">У вас нет просроченных задач!</div>
         ))}
       {caseId == 3 &&
         (taskNow.getTaskFinished().length > 0 ? (
@@ -230,7 +257,17 @@ const TaskS = ({ caseId }: Itasks) => {
               <div className="flex ">
                 <div className="grid h-5  w-7 justify-center ">
                   <div>✅</div>
-                  <Image alt="reloadTask" src="/ReloadTask.svg" width={17} height={17} className="cursor-pointer" />
+                  <Image
+                    onClick={() => {
+                      task.postWindowUpdateTask(true);
+                      setCurrentTask(taskData);
+                    }}
+                    alt="reloadTask"
+                    src="/ReloadTask.svg"
+                    width={17}
+                    height={17}
+                    className="cursor-pointer"
+                  />
                 </div>
                 <div className="grid w-full">
                   <div className="flex  items-center justify-between">
@@ -238,9 +275,19 @@ const TaskS = ({ caseId }: Itasks) => {
                     <div>{taskData.priority}</div>
                   </div>
                   {taskData.description && <div className="text-[13px] text-gray-500">{taskData.description}</div>}
-                  <div className="flex justify-between">
+                  <div className="flex justify-between mb-2">
                     {checkIdDate(taskData.id)}
-                    <Image onClick={() => fuDeleteTask(taskData.id)} alt="basket" src="/BasketTask.svg" width={17} height={17} className="cursor-pointer" />
+                    <Image
+                      onClick={() => {
+                        setDeleteTask(true);
+                        setCurrentTask(taskData);
+                      }}
+                      alt="basket"
+                      src="/BasketTask.svg"
+                      width={17}
+                      height={17}
+                      className="cursor-pointer"
+                    />
                   </div>
                 </div>
               </div>
@@ -248,8 +295,32 @@ const TaskS = ({ caseId }: Itasks) => {
             </section>
           ))
         ) : (
-          <div className="font-normal text-[14px] text-gray-500 mt-1 cursor-pointer hover:text-gray-600 duration-300 ease-in-out">У вас нет выполненных задач!</div>
+          <div className="font-normal text-[14px] text-gray-500 mt-1 hover:text-gray-600 duration-300 ease-in-out">У вас нет выполненных задач!</div>
         ))}
+      {task.getWindowUpdateTask() && currentTask && <UpdateFunction key={currentTask?.id} configTask={currentTask} />}
+      {deleteTask && (
+        <div className="absolute inset-0 h-screen w-screen flex items-center justify-center">
+          <div className="grid gap-5 bg-white p-5 rounded border border-gray-300 z-9999">
+            <div>Вы уверены, что хотите безвозвратно удалить эту задачу? Это действие невозможно восстановить.</div>
+            <div className="flex gap-5 justify-center">
+              <button className={`${buttonStyle}  text-gray-900`} onClick={() => setDeleteTask(false)}>
+                Отмена
+              </button>
+              <button
+                className={`${buttonStyle}  text-gray-900`}
+                onClick={() => {
+                  if (currentTask && currentTask.id) {
+                    fuDeleteTask(currentTask.id);
+                  }
+                  setDeleteTask(false);
+                }}
+              >
+                Удалить
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

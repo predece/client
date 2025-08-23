@@ -9,7 +9,8 @@ import { useEffect } from "react";
 import type { Itask } from "@/store/taskDeadlineStore";
 import { AddTask } from "@/http/Task";
 import { getCookie } from "./taskStructure/TaskS";
-const buttonStyle = "border p-1 rounded hover:bg-hover-color transition-colors duration-400 ease-in-out cursor-pointer w-30 text-gray-400 border-gray-300";
+
+export const buttonStyle = "border p-1 rounded hover:bg-hover-color transition-colors duration-400 ease-in-out cursor-pointer w-30 text-gray-400 border-gray-300";
 
 const NewTask = () => {
   const { task, taskNow } = useContext(Context);
@@ -18,13 +19,11 @@ const NewTask = () => {
     PriorityWindow: false,
     CheckCloseWindow: false,
   });
-  const [deadline, setDeadline] = useState(null);
-  const [userId, setUserId] = useState<string>("");
   const [config, setConfig] = useState<Itask>({
     title: "",
     description: "",
     UserId: "",
-    deadline: null,
+    deadline: new Date(),
     priority: "medium",
     status: "todo",
     notified: false,

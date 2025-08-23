@@ -23,7 +23,7 @@ export const DeleteTask = async (id: number) => {
   return data;
 };
 
-export const UpdateTassk = async (config: Itask) => {
+export const UpdateTask = async (config: Itask) => {
   const { data } = await $host.post("api/task/update", config);
   return data;
 };

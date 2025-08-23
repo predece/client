@@ -7,6 +7,8 @@ class Task {
   onClickOpenWindowExpiredTask: boolean = false; // Открытие окна "Просрочено"
   onClickOpenWindowMessageTask: boolean = false; // Открытие окна "Уведомление о таксах"
   onWindowLoading: boolean = false; // Окно загрузки (модификация)
+  onClickOpenWindowUpdateTask: boolean = false; // Открытие окна "Обновление тасков"
+  onBackGroundTitle: string = "";
   constructor() {
     makeAutoObservable(this);
   }
@@ -35,9 +37,19 @@ class Task {
       this.onClickOpenWindowMessageTask = status;
     }
   }
-  postWindowLoading(state: boolean) {
-    if (this.onWindowLoading != state) {
-      this.onWindowLoading = state;
+  postWindowLoading(status: boolean) {
+    if (this.onWindowLoading != status) {
+      this.onWindowLoading = status;
+    }
+  }
+  postWindowUpdateTask(status: boolean) {
+    if (this.onClickOpenWindowUpdateTask != status) {
+      this.onClickOpenWindowUpdateTask = status;
+    }
+  }
+  postBackGroundTitle(title: string) {
+    if (this.onBackGroundTitle != title) {
+      this.onBackGroundTitle = title;
     }
   }
 
@@ -58,6 +70,12 @@ class Task {
   }
   getWindowLoading() {
     return this.onWindowLoading;
+  }
+  getWindowUpdateTask() {
+    return this.onClickOpenWindowUpdateTask;
+  }
+  getBackGroundTitle() {
+    return this.onBackGroundTitle;
   }
 }
 

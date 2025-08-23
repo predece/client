@@ -4,7 +4,7 @@ import { Context } from "@/app/mobx-provider";
 import TaskS from "./taskStructure/TaskS";
 
 const TaskList = () => {
-  const { task, taskNow } = useContext(Context);
+  const { task } = useContext(Context);
   const statusWindow = task.getWindowTitleTask();
   return (
     <>

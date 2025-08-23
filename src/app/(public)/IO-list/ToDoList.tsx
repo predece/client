@@ -21,7 +21,7 @@ import { CONFIG } from "@/config/page.config";
 
 const ToDoList = () => {
   const { store, user, task } = useContext(Context);
-
+  const [statqw, setSt] = useState(false);
   const [userName, setUserName] = useState<string | null>();
   const [name, setName] = useState<string>("");
   const [img, setImg] = useState<File | null>(null);
@@ -68,19 +68,22 @@ const ToDoList = () => {
           if (img) {
             task.postWindowLoading(true);
           }
-
           const data = await Config(formData);
-          console.log(data.data.img);
-          if (data?.data) {
+
+          if (data.message) {
+            store.postError(data.message);
+          }
+          if (!data.message) {
             setUserName(data.data.name);
             setUrlImage(data.data.img);
+            setName("");
+            setImg(null);
           }
-
-          console.log(task.getWindowLoading());
           if (img && data?.data.img) {
             task.postWindowLoading(false);
           }
         } catch (error) {
+          console.log(error);
           store.postError("Ошибка сети при сохранении.");
         }
       }
@@ -139,6 +142,7 @@ const ToDoList = () => {
                           name && (name.length <= 16 ? "border-green-400 focus:border-green-600" : "border-red-400 focus:border-red-600")
                         }`}
                         placeholder="Name"
+                        value={name}
                         onChange={(e) => setName(e.target.value)}
                       />
                       <button
@@ -173,7 +177,9 @@ const ToDoList = () => {
                       </label>
                       <button
                         className="cursor-pointer border rounded p-2 border-gray-500/50 hover:bg-gray-200/80 transition duration-300 ease-in-out hover:translate-x-1"
-                        onClick={() => FuSaveConfig("image")}
+                        onClick={() => {
+                          FuSaveConfig("image");
+                        }}
                       >
                         <Image src="/SaveConfigIcon.svg" alt="config-IO" width={20} height={20} />
                       </button>
@@ -195,16 +201,17 @@ const ToDoList = () => {
                   className="flex text-[18px] w-full text-orange-600 cursor-pointer active:text-[17.5px] active:scale-95 duration-200 ease-in-out hover:bg-hover-color rounded transform-gpu z-1 m-[10px_0px]"
                   onClick={() => {
                     task.postWindowTask(true);
+                    setSt(true);
                   }}
                 >
                   + Добавить задачу
                 </button>
                 <button
                   className={`text-[15px] border-border-color  p-1  w-full text-left  transition-colors duration-200 ease-in-out cursor-pointer ${
-                    activeButton === "incoming" ? "bg-active-menu-task-color rounded hover:bg-active-menu-task-color" : "hover:bg-hover-color"
+                    task.getBackGroundTitle() === "incoming" ? "bg-active-menu-task-color rounded hover:bg-active-menu-task-color" : "hover:bg-hover-color"
                   }`}
                   onClick={() => {
-                    setActiveButton("incoming");
+                    task.postBackGroundTitle("incoming");
                     task.postWindowTitleTask(true);
                     task.postWindowDoneTask(false);
                     task.postWindowExpiredTask(false);
@@ -214,10 +221,10 @@ const ToDoList = () => {
                 </button>
                 <button
                   className={`text-[15px] border-border-color  p-1  w-full text-left  transition-colors duration-200 ease-in-out cursor-pointer ${
-                    activeButton === "expired" ? "bg-active-menu-task-color rounded hover:bg-active-menu-task-color" : "hover:bg-hover-color"
+                    task.getBackGroundTitle() === "expired" ? "bg-active-menu-task-color rounded hover:bg-active-menu-task-color" : "hover:bg-hover-color"
                   }`}
                   onClick={() => {
-                    setActiveButton("expired");
+                    task.postBackGroundTitle("expired");
                     task.postWindowTitleTask(false);
                     task.postWindowDoneTask(false);
                     task.postWindowExpiredTask(true);
@@ -227,10 +234,10 @@ const ToDoList = () => {
                 </button>
                 <button
                   className={`text-[15px] border-border-color  p-1  w-full text-left transition-colors duration-200 ease-in-out cursor-pointer ${
-                    activeButton === "done" ? "bg-active-menu-task-color rounded hover:bg-active-menu-task-color" : "hover:bg-hover-color"
+                    task.getBackGroundTitle() === "done" ? "bg-active-menu-task-color rounded hover:bg-active-menu-task-color" : "hover:bg-hover-color"
                   }`}
                   onClick={() => {
-                    setActiveButton("done");
+                    task.postBackGroundTitle("done");
                     task.postWindowTitleTask(false);
                     task.postWindowDoneTask(true);
                     task.postWindowExpiredTask(false);
